@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Widget de Estudio</title>
+  <style>
+    :root {
+      --bg: #111111;
+      --card: #1a1a1a;
+      --text: #f5f5f5;
+      --muted: #b3b3b3;
+      --accent: #7c5cff;
+      --border: #2a2a2a;
+      --success: #22c55e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Inter, system-ui, sans-serif;
+    }
+
+    body {
+      background: transparent;
+      color: var(--text);
+      padding: 12px;
+    }
+
+    .widget {
+      width: 100%;
+      max-width: 380px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .title {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .day {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .total {
+      margin: 10px 0 14px;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    .progress {
+      width: 100%;
+      height: 10px;
+      background: #262626;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      border-radius: 999px;
+      transition: width 0.4s ease;
+    }
+
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .task {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #151515;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+
+    .task-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .task-time {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .footer {
+      margin-top: 16px;
+      font-size: 0.85rem;
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 0.92rem;
+      padding: 8px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="widget">
+    <div class="top">
+      <div class="title">📚 Estudio de hoy</div>
+      <div class="day" id="dayLabel"></div>
+    </div>
+
+    <div class="total" id="totalLabel"></div>
+    <div class="progress">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="task-list" id="taskList"></div>
+    <div class="footer">Objetivo: no pasar de 2 horas</div>
+  </div>
+
+  <script>
+    const schedule = {
+      Lunes: [
+        { name: "🇺🇸 Inglés", minutes: 60 },
+        { name: "🎓 TECLAB", minutes: 60 }
+      ],
+      Martes: [
+        { name: "🇺🇸 Open English", minutes: 60 },
+        { name: "📘 Curso / práctica", minutes: 60 }
+      ],
+      Miércoles: [
+        { name: "🎓 TECLAB", minutes: 120 }
+      ],
+      Jueves: [
+        { name: "🇺🇸 Open English", minutes: 60 },
+        { name: "🧠 Proyecto / curso", minutes: 60 }
+      ],
+      Viernes: [
+        { name: "🎓 TECLAB", minutes: 60 },
+        { name: "📝 Repaso / notas", minutes: 60 }
+      ],
+      Sábado: [
+        { name: "💻 Proyecto personal", minutes: 120 }
+      ],
+      Domingo: [
+        { name: "😌 Descanso o repaso ligero", minutes: 45 }
+      ]
+    };
+
+    const days = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+    const today = new Date();
+    const todayName = days[today.getDay()];
+
+    const tasks = schedule[todayName] || [];
+    const total = tasks.reduce((acc, task) => acc + task.minutes, 0);
+    const maxMinutes = 120;
+    const progress = Math.min((total / maxMinutes) * 100, 100);
+
+    document.getElementById("dayLabel").textContent = todayName;
+    document.getElementById("totalLabel").textContent = `Tiempo planificado: ${total} / ${maxMinutes} min`;
+    document.getElementById("progressBar").style.width = `${progress}%`;
+
+    const taskList = document.getElementById("taskList");
+
+    if (tasks.length === 0) {
+      taskList.innerHTML = `<div class="empty">No hay tareas asignadas para hoy.</div>`;
+    } else {
+      tasks.forEach(task => {
+        const el = document.createElement("div");
+        el.className = "task";
+        el.innerHTML = `
+          <div class="task-name">${task.name}</div>
+          <div class="task-time">${task.minutes} min</div>
+        `;
+        taskList.appendChild(el);
+      });
+    }
+  </script>
+</body>
+</html>
